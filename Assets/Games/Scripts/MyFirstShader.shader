@@ -9,10 +9,18 @@ Shader "Custom/MyFirstShader"
     }
     SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags {
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
+        }
 
         Pass
         {
+            Cull off
+            ZWrite off
+            Blend One One       // Additive
+            //Blend DstColor Zero //Multiple
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -59,8 +67,10 @@ Shader "Custom/MyFirstShader"
                 float xOffset = cos(i.uv.x * TAU * 8) * 0.01 ;
                 float t = cos((i.uv.y  + xOffset - _Time.y * 0.5) * TAU * 5) * 0.5 + 0.5;
                 t *= 1 - i.uv.y;
+                float faceRemoveal = abs(i.normals.y) < 0.999;
+                float4 gradient = lerp(_ColorA, _ColorB, i.uv.y);
 
-                return t;
+                return t * gradient * faceRemoveal;
             }
             ENDCG
         }
